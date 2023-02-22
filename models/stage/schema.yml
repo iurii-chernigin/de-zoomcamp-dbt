@@ -1,0 +1,10 @@
+version: 2
+
+sources: 
+    - name: stage
+      database: secure-analyzer-375018
+      schema: raw
+
+      tables:
+        - name: green_taxi_trips
+        - name: yellow_taxi_trips
