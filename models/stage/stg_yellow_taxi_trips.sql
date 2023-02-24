@@ -1,6 +1,20 @@
 {{ config(materialized='view') }}
 
 
+with tripdata as (
+
+  select 
+
+    *,
+    row_number() over (
+        partition by vendorid, tpep_pickup_datetime
+    ) as rn
+
+  from {{ source('stage', 'yellow_taxi_trips') }}
+  where vendorid is not null 
+
+)
+
 select 
     'Yellow' as service_type,
     {{ dbt_utils.generate_surrogate_key(['vendorid', 'tpep_pickup_datetime'])}} as trip_id,
@@ -37,8 +51,9 @@ select
     cast(improvement_surcharge as numeric) as improvement_surcharge_amount,
     cast(congestion_surcharge as numeric) as congestion_surcharge_amount
 
-from {{ source("stage", "yellow_taxi_trips") }}
-where vendorid is not null
+from tripdata
+where rn = 1
+
 {% if var('is_test_run', default=true) %}
 
     limit 100
