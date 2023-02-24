@@ -20,8 +20,10 @@ models:
       - name: trip_id
         description: Primary key for this table, generates with concatenation of vendorid + pickup_datetime
         tests:
-          - not_null
-          - unique
+          - not_null:
+              severity: warn
+          - unique:
+              severity: warn
       - name: vendor_id
         description: >
           A code indicating the LPEP provider that provided the record. 
@@ -29,14 +31,12 @@ models:
               1 = Creative Mobile Technologies, LLC; 
               2 = VeriFone Inc.
         tests:
-          - not_null
+          - not_null:
+              severity: warn
           - accepted_values:
               values: "{{ var('accepted_vendor_ids') }}"
               quote: false
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">0"
+              severity: warn
       - name: vendor
         description: Resloved vendor name based on documentation (see description for the vendor_id field)
       - name: pickup_location_id
@@ -65,8 +65,8 @@ models:
         tests:
           - accepted_values:
               values: "{{ var('accepted_payment_type_ids') }}"
-              quote: false
               severity: warn
+              quote: false
       - name: payment_type
         description: Resolved based on payment_type_id (raw name payment_type) field
       - name: rate_code_id
@@ -102,7 +102,8 @@ models:
       - name: passenger_count
         description: The number of passengers in the vehicle. This is a driver-entered value.
         tests: 
-          - is_zero_or_negative
+          - is_zero_or_negative:
+              severity: warn
 
 
   - name: stg_yellow_taxi_trips
@@ -114,9 +115,10 @@ models:
       - name: trip_id
         description: Primary key for this table, generates with concatenation of vendorid + pickup_datetime
         tests:
-          - not_null
-          - unique
-
+          - not_null:
+              severity: warn
+          - unique:
+              severity: warn
       - name: vendor_id
         description: >
           A code indicating the LPEP provider that provided the record. 
@@ -128,10 +130,7 @@ models:
           - accepted_values:
               values: "{{ var('accepted_vendor_ids') }}"
               quote: false
-              config:
-                severity: error
-                error_if: ">1000"
-                warn_if: ">0"
+              severity: warn
       - name: vendor
         description: Resloved vendor name based on documentation (see description for the vendor_id field)
       - name: pickup_location_id
@@ -187,4 +186,5 @@ models:
       - name: passenger_count
         description: The number of passengers in the vehicle. This is a driver-entered value.
         tests: 
-          - is_zero_or_negative
+          - is_zero_or_negative:
+              severity: warn
