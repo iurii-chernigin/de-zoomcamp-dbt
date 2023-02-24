@@ -39,7 +39,7 @@ vars:
   accepted_payment_type_ids: [1, 2, 3, 4, 5, 6]
   accepted_rate_code_ids: [1, 2, 3, 4, 5, 6]
   accepted_trip_type_ids: [1, 2]
-  accepted_vendor_ids: [1, 2, 3]
+  accepted_vendor_ids: [1, 2]
 
 
 seeds:
