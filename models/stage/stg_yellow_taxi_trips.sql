@@ -8,6 +8,15 @@ select
     cast(vendorid as integer) as vendor_id,
     cast(pulocationid as integer) as pickup_location_id, 
     cast(dolocationid as integer) as dropoff_location_id, 
+    cast(payment_type as integer) as payment_type_id,
+    cast(ratecodeid as integer) as rate_code_id,
+    null as trip_type_id,
+
+    -- resolve identifiers
+    {{ get_vendor_description('vendorid') }} as vendor,
+    {{ get_payment_type_description('payment_type') }} as payment_type,
+    {{ get_rate_code_description('ratecodeid') }} as rate_code,
+    cast(null as string) as trip_type,
 
     -- timestamps
     cast(tpep_pickup_datetime as timestamp) as pickup_datetime, 
@@ -26,12 +35,7 @@ select
     cast(tip_amount as numeric) as tip_amount,
     cast(tolls_amount as numeric) as tolls_amount,
     cast(improvement_surcharge as numeric) as improvement_surcharge_amount,
-    cast(congestion_surcharge as numeric) as congestion_surcharge_amount,
-
-    -- resolve identifiers
-    {{ get_payment_type_description('payment_type') }} as payment_type,
-    {{ get_rate_code_description('ratecodeid') }} as rate_code,
-    cast(null as string) as trip_type
+    cast(congestion_surcharge as numeric) as congestion_surcharge_amount
 
 from {{ source("stage", "yellow_taxi_trips") }}
 where vendorid is not null
