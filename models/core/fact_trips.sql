@@ -7,6 +7,7 @@ with green_trips as (
         trip_id,
         service_type,
         vendor_id,
+        vendor,
         -- trip details
         trip_type,
         pickup_location_id, 
@@ -36,6 +37,7 @@ yellow_trips as (
         trip_id,
         service_type,
         vendor_id,
+        vendor,
         -- trip details
         trip_type,
         pickup_location_id, 
@@ -80,6 +82,7 @@ select
     trips_unioned.trip_id,
     trips_unioned.service_type,
     trips_unioned.vendor_id,
+    trips_unioned.vendor,
     trips_unioned.trip_type,
 
     -- trip details

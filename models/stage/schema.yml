@@ -8,3 +8,183 @@ sources:
       tables:
         - name: green_taxi_trips
         - name: yellow_taxi_trips
+
+
+models:
+  - name: stg_green_taxi_trips
+    description: >
+      Green taxi trip records include fields capturing pick-up and drop-off dates/times, 
+      pick-up and drop-off locations, trip distances, itemized fares, rate types, payment 
+      types, and driver-reported passenger counts.
+    columns:
+      - name: trip_id
+        description: Primary key for this table, generates with concatenation of vendorid + pickup_datetime
+        tests:
+          - not_null
+          - unique
+      - name: vendor_id
+        description: >
+          A code indicating the LPEP provider that provided the record. 
+          A code indicating the TPEP provider that provided the record.
+              1 = Creative Mobile Technologies, LLC; 
+              2 = VeriFone Inc.
+        tests:
+          - not_null
+          - accepted_values:
+              values: "{{ var('accepted_vendor_ids') }}"
+              quote: false
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">0"
+      - name: vendor
+        description: Resloved vendor name based on documentation (see description for the vendor_id field)
+      - name: pickup_location_id
+        description: TLC Taxi Zone in which the taximeter was engaged
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: dropoff_location_id
+        description: TLC Taxi Zone in which the taximeter was disengaged
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: payment_type_id
+        description: >
+          A numeric code signifying how the passenger paid for the trip.
+            1 = Credit card
+            2 = Cash
+            3 = No charge
+            4 = Dispute
+            5 = Unknown
+            6 = Voided trip
+        tests:
+          - accepted_values:
+              values: "{{ var('accepted_payment_type_ids') }}"
+              quote: false
+              severity: warn
+      - name: payment_type
+        description: Resolved based on payment_type_id (raw name payment_type) field
+      - name: rate_code_id
+        description: >
+            The final rate code in effect at the end of the trip.
+              1 = Standard rate
+              2 = JFK
+              3 = Newark
+              4 = Nassau or Westchester
+              5 = Negotiated fare
+              6 = Group ride
+        tests:
+          - accepted_values:
+              values: "{{ var('accepted_rate_code_ids') }}"
+              quote: false
+              severity: warn
+      - name: rate_code
+        description: Resolved based on rate_code_id field
+      - name: trip_type_id
+        description: >
+          A code indicating whether the trip was a street-hail or a dispatch
+          that is automatically assigned based on the metered rate in use but
+          can be altered by the driver.
+              1= Street-hail
+              2= Dispatch
+        tests:
+          - accepted_values:
+              values: "{{ var('accepted_trip_type_ids') }}"
+              quote: false
+              severity: warn
+      - name: trip_type
+        description: Resolved based on the trip_type_id field
+      - name: passenger_count
+        description: The number of passengers in the vehicle. This is a driver-entered value.
+        tests: 
+          - is_zero_or_negative
+
+
+  - name: stg_yellow_taxi_trips
+    description: >
+      Yellow taxi trip records include fields capturing pick-up and drop-off dates/times, 
+      pick-up and drop-off locations, trip distances, itemized fares, rate types, payment 
+      types, and driver-reported passenger counts.
+    columns:
+      - name: trip_id
+        description: Primary key for this table, generates with concatenation of vendorid + pickup_datetime
+        tests:
+          - not_null
+          - unique
+
+      - name: vendor_id
+        description: >
+          A code indicating the LPEP provider that provided the record. 
+          A code indicating the TPEP provider that provided the record.
+              1 = Creative Mobile Technologies, LLC; 
+              2 = VeriFone Inc.
+        tests:
+          - not_null
+          - accepted_values:
+              values: "{{ var('accepted_vendor_ids') }}"
+              quote: false
+              config:
+                severity: error
+                error_if: ">1000"
+                warn_if: ">0"
+      - name: vendor
+        description: Resloved vendor name based on documentation (see description for the vendor_id field)
+      - name: pickup_location_id
+        description: TLC Taxi Zone in which the taximeter was engaged
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: dropoff_location_id
+        description: TLC Taxi Zone in which the taximeter was disengaged
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: payment_type_id
+        description: >
+          A numeric code signifying how the passenger paid for the trip.
+            1 = Credit card
+            2 = Cash
+            3 = No charge
+            4 = Dispute
+            5 = Unknown
+            6 = Voided trip
+        tests:
+          - accepted_values:
+              values: "{{ var('accepted_payment_type_ids') }}"
+              quote: false
+              severity: warn
+      - name: payment_type
+        description: Resolved based on payment_type_id (raw name payment_type) field
+      - name: rate_code_id
+        description: >
+          The final rate code in effect at the end of the trip.
+            1 = Standard rate
+            2 = JFK
+            3 = Newark
+            4 = Nassau or Westchester
+            5 = Negotiated fare
+            6 = Group ride
+        tests:
+          - accepted_values:
+              values: "{{ var('accepted_rate_code_ids') }}"
+              quote: false
+              severity: warn
+      - name: rate_code
+        description: Resolved based on rate_code_id field
+      - name: trip_type_id
+        description: Always is null, dummy field to support a consistent structure with other trip datasets
+      - name: trip_type
+        description: Always is null, dummy field to support a consistent structure with other trip datasets
+      - name: passenger_count
+        description: The number of passengers in the vehicle. This is a driver-entered value.
+        tests: 
+          - is_zero_or_negative
