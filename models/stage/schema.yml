@@ -8,6 +8,7 @@ sources:
       tables:
         - name: green_taxi_trips
         - name: yellow_taxi_trips
+        - name: fhv_taxi_trips_external
 
 
 models:
@@ -188,3 +189,52 @@ models:
         tests: 
           - is_zero_or_negative:
               severity: warn
+
+
+  - name: stg_fhv_taxi_trips
+    description: >
+      For-Hire Vehicle (“FHV”) trip records include fields capturing the dispatching base license number 
+      and the pick-up date, time, and taxi zone location ID (shape file below).
+      These records are generated from the FHV Trip Record submissions made by bases.
+    columns:
+      - name: trip_id
+        description: >
+          Primary key for this table, generates with concatenation of       
+            \- pickup_datetime
+            \- dropOff_datetime
+            \- PUlocationID
+            \- DOlocationID
+            \- dispatching_base_num
+        tests:
+          - not_null:
+              severity: warn
+          - unique:
+              severity: warn
+      - name: pickup_location_id
+        description: TLC Taxi Zone in which the trip began
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: pickup_datetime
+        description: The date and time of the trip pick-up
+        tests:
+          - not_null
+      - name: dropoff_location_id
+        description: TLC Taxi Zone in which the trip ended
+        tests:
+          - relationships:
+              to: ref('dim_zones')
+              field: location_id
+              severity: warn
+      - name: dropoff_datetime
+        description: The date and time of the trip dropoff
+        tests:
+          - not_null
+      - name: is_shared_trip
+        description: Indicates if the trip was a part of a shared ride chain offered by a High Volume FHV company (e.g. Uber Pool, Lyft Line).
+        tests:
+          - not_null
+      - name: dispatching_base_number
+        description: The TLC Base License Number of the base that dispatched the trip
