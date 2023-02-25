@@ -1,5 +1,5 @@
 {{ config(
-        matearilized='table',
+        materialized='table',
         partition_by={
             'field': 'pickup_datetime',
             'data_type': 'timestamp',
