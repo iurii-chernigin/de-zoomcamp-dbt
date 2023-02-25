@@ -30,8 +30,8 @@ select
     trips.affiliated_base_number
 from {{ ref('stg_fhv_taxi_trips') }} as trips
 
-left join dim_zones pickup_zone
+inner join dim_zones pickup_zone
       on pickup_zone.location_id = trips.pickup_location_id
       
-left join dim_zones dropoff_zone
+inner join dim_zones dropoff_zone
       on dropoff_zone.location_id = trips.dropoff_location_id
